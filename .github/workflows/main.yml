@@ -1,0 +1,58 @@
+name: Docker Image CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Git config user
+      # You may pin to the exact commit or the version.
+      # uses: snow-actions/git-config-user@84b24d833b169b1a874be9fae7a7128a57babba2
+      uses: snow-actions/git-config-user@v1.0.0
+    
+    - name: setup-git-credentials
+      # You may pin to the exact commit or the version.
+      # uses: de-vri-es/setup-git-credentials@22398fb46e8acdbfd51d7197e53c4f9fc3e0a53e
+      uses: de-vri-es/setup-git-credentials@v2.0.8
+      with:
+        # git credentials use
+        credentials: https://${{ secrets.USR }}:${{ secrets.USR_PWD }}@github.com/
+        
+    - name: Setup Go environment
+      uses: actions/setup-go@v3.2.0
+      with:
+        # The Go version to download (if necessary) and use. Supports semver spec and ranges.
+        go-version: 1.17.11
+        # Used to specify whether caching is needed. Set to true, if you'd like to enable caching.
+        cache: true
+        
+    - name: go build
+      run: |
+         /opt/hostedtoolcache/go/1.17.11/x64/bin/go env -w CGO_ENABLED=0 
+         /opt/hostedtoolcache/go/1.17.11/x64/bin/go mod tidy
+         /opt/hostedtoolcache/go/1.17.11/x64/bin/go build -o exec
+          
+    - name: Docker Login
+      # You may pin to the exact commit or the version.
+      # uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
+      uses: docker/login-action@v2.0.0
+      with:
+        # Username used to log against the Docker registry
+        username: ${{ secrets.DOCKER_USR }}
+        # Password or personal access token used to log against the Docker registry
+        password: ${{ secrets.DOCKER_PWD }}
+        
+    
+    - name: Build the Docker image
+      run: docker build -t standardcore/healthapi:1.0.${{ github.run_number }} .
+      
+    - name: Push the Docker image
+      run: docker push standardcore/healthapi:1.0.${{ github.run_number }}
+        
