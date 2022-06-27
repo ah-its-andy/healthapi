@@ -25,18 +25,17 @@ jobs:
         # git credentials use
         credentials: https://${{ secrets.USR }}:${{ secrets.USR_PWD }}@github.com/
         
-    - name: Setup Go environment
-      uses: actions/setup-go@v3.2.0
-      with:
-        # The Go version to download (if necessary) and use. Supports semver spec and ranges.
-        go-version: 1.17.11
-        # Used to specify whether caching is needed. Set to true, if you'd like to enable caching.
-        cache: true
+#     - name: Setup Go environment
+#       uses: actions/setup-go@v3.2.0
+#       with:
+#         # The Go version to download (if necessary) and use. Supports semver spec and ranges.
+#         go-version: 1.17.11
+#         # Used to specify whether caching is needed. Set to true, if you'd like to enable caching.
+#         cache: true
         
     - name: go build
       run: |
-         /opt/hostedtoolcache/go/1.17.11/x64/bin/go env -w CGO_ENABLED=0 
-         /opt/hostedtoolcache/go/1.17.11/x64/bin/go mod tidy
+         /opt/hostedtoolcache/go/1.17.11/x64/bin/go env -w CGO_ENABLED=0         
          /opt/hostedtoolcache/go/1.17.11/x64/bin/go build -o exec
           
     - name: Docker Login
